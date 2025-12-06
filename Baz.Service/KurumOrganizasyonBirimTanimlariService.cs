@@ -115,6 +115,13 @@ namespace Baz.Service
         /// </summary>
         /// <returns></returns>
         public Result<bool> AdminMi();
+
+        /// <summary>
+        /// Kurum ID'ye göre OrganizasyonBirimTipiId 1 olan kayıtları listeler
+        /// </summary>
+        /// <param name="kurumId">İlgili Kurum ID</param>
+        /// <returns></returns>
+        public Result<List<KurumOrganizasyonBirimView>> GetByKurumIdAndTipId(int kurumId);
     }
 
     /// <summary>
@@ -616,6 +623,35 @@ namespace Baz.Service
                 return false.ToResult();
             }
             return _kurumKisi.List(a => a.AktifMi == 1 && a.KurumOrganizasyonBirimTanimId == rs.TabloID).Value.Any(b => b.IlgiliKisiId == _loginUser.KisiID).ToResult();
+        }
+
+        /// <summary>
+        /// Kurum ID'ye göre OrganizasyonBirimTipiId 1 olan kayıtları listeler
+        /// </summary>
+        /// <param name="kurumId">İlgili Kurum ID</param>
+        /// <returns></returns>
+        public Result<List<KurumOrganizasyonBirimView>> GetByKurumIdAndTipId(int kurumId)
+        {
+            if (kurumId == 0)
+            {
+                return Results.Fail("Kurum ID geçersiz!", ResultStatusCode.ReadError);
+            }
+
+            var result = _repository.List(p => p.IlgiliKurumId == kurumId && p.OrganizasyonBirimTipiId == 1 && p.AktifMi == 1 && p.SilindiMi == 0)
+                .Select(p => new KurumOrganizasyonBirimView()
+                {
+                    TabloId = p.TabloID,
+                    KurumId = p.KurumID,
+                    IlgiliKurumID = p.IlgiliKurumId.Value,
+                    Tanim = p.BirimTanim,
+                    TipId = p.OrganizasyonBirimTipiId.Value,
+                    UstId = p.UstId.Value,
+                    Koordinat = p.Koordinat
+                })
+                .OrderBy(x => x.Tanim)
+                .ToList();
+
+            return result.ToResult();
         }
     }
 }

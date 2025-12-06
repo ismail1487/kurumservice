@@ -243,5 +243,18 @@ namespace Baz.KurumServiceApi.Controllers
         {
             return _service.AdminMi();
         }
+
+        /// <summary>
+        /// Kurum ID'ye göre OrganizasyonBirimTipiId 1 olan kayıtları listeler
+        /// </summary>
+        /// <param name="kurumId">İlgili Kurum ID</param>
+        /// <returns></returns>
+        [Route("GetByKurumIdAndTipId/{kurumId}")]
+        [ProcessName(Name = "GetByKurumIdAndTipId")]
+        [HttpGet]
+        public Result<List<KurumOrganizasyonBirimView>> GetByKurumIdAndTipId(int kurumId)
+        {
+            return _service.GetByKurumIdAndTipId(kurumId);
+        }
     }
 }
