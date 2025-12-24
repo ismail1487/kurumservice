@@ -6,11 +6,13 @@ EXPOSE 80
 
 FROM mcr.microsoft.com/dotnet/sdk:5.0 AS build
 WORKDIR /src
-COPY ["Baz.ServisApi/Baz.KurumServiceApi.csproj", "Baz.ServisApi/"]
-COPY ["Baz.Service/Baz.Service.csproj", "Baz.Service/"]
-RUN dotnet restore "Baz.ServisApi/Baz.KurumServiceApi.csproj" -s http://172.16.31.10/NugetServer/nuget -s https://api.nuget.org/v3/index.json
-COPY . .
-WORKDIR "/src/Baz.ServisApi"
+COPY ["bazkurum/Baz.ServisApi/Baz.KurumServiceApi.csproj", "bazkurum/Baz.ServisApi/"]
+COPY ["bazkurum/Baz.Service/Baz.Service.csproj", "bazkurum/Baz.Service/"]
+COPY packages /src/packages
+RUN dotnet restore "bazkurum/Baz.ServisApi/Baz.KurumServiceApi.csproj" --source /src/packages  --source https://api.nuget.org/v3/index.json
+COPY bazkurum/Baz.ServisApi bazkurum/Baz.ServisApi
+COPY bazkurum/Baz.Service bazkurum/Baz.Service
+WORKDIR "/src/bazkurum/Baz.ServisApi"
 RUN dotnet build "Baz.KurumServiceApi.csproj" -c Release -o /app/build
 
 FROM build AS publish

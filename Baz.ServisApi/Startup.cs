@@ -65,7 +65,8 @@ namespace Baz.KurumServiceApi
         /// <param name="services"></param>
         public void ConfigureServices(IServiceCollection services)
         {
-            SetCoreURL(Configuration.GetValue<string>("CoreUrl"));
+            SetCoreURL(Configuration);
+
             services.AddHttpContextAccessor();
             services.AddControllers(c => { c.Filters.Add(typeof(ModelValidationFilter), int.MinValue); });
             services.AddSwaggerGen(c =>
@@ -228,9 +229,17 @@ namespace Baz.KurumServiceApi
             return mapper;
         }
 
-        private static void SetCoreURL(string url)
+        private static void SetCoreURL(IConfiguration configuration)
         {
-            LocalPortlar.CoreUrl = url;
+            Model.Entity.Constants.LocalPortlar.CoreUrl = configuration.GetValue<string>("CoreUrl");
+
+            var section = configuration.GetSection("LocalPortlar");
+            LocalPortlar.WebApp = section.GetValue<string>("WebApp");
+            LocalPortlar.UserLoginregisterService = section.GetValue<string>("UserLoginregisterService");
+            LocalPortlar.KisiServis = section.GetValue<string>("KisiServis");
+            LocalPortlar.MedyaKutuphanesiService = section.GetValue<string>("MedyaKutuphanesiService");
+            LocalPortlar.IYSService = section.GetValue<string>("IYSService");
+            LocalPortlar.KurumService = section.GetValue<string>("KurumService");
         }
     }
 }
